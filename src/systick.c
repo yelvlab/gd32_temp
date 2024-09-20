@@ -1,37 +1,14 @@
-/*!
-    \file    systick.c
-    \brief   the systick configuration file
-
-    \version 2024-02-22, V2.1.0, firmware for GD32E23x
-*/
-
-/*
-    Copyright (c) 2024, GigaDevice Semiconductor inc.
-
-    Redistribution and use in source and binary forms, with or without modification,
-are permitted provided that the following conditions are met:
-
-    1. Redistributions of source code must retain the above copyright notice, this
-       list of conditions and the following disclaimer.
-    2. Redistributions in binary form must reproduce the above copyright notice,
-       this list of conditions and the following disclaimer in the documentation
-       and/or other materials provided with the distribution.
-    3. Neither the name of the copyright holder nor the names of its contributors
-       may be used to endorse or promote products derived from this software without
-       specific prior written permission.
-
-    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
-INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
-OF SUCH DAMAGE.
-*/
-
+/**
+ * ************************************************************************
+ *
+ * @file systick.c
+ * @author GD32
+ * @brief 通过 SysTick 定时器进行微秒级别和毫秒级别的延时函数
+ *
+ * ************************************************************************
+ * @copyright Copyright (c) 2024 GD32
+ * ************************************************************************
+ */
 #include "gd32e23x.h"
 #include "systick.h"
 
@@ -54,7 +31,6 @@ void systick_config(void)
     //计算了每毫秒所需的 SysTick 计数值
     count_1ms = (float)count_1us * 1000;
 }
-
 
 /**
  * ************************************************************************
@@ -83,9 +59,7 @@ void delay_us(uint32_t count)
     SysTick->CTRL &= ~SysTick_CTRL_ENABLE_Msk;
     //将 SysTick 计数器的当前值清零，以便下次使用
     SysTick->VAL = 0x0000U;
-
 }
-
 
 /**
  * ************************************************************************

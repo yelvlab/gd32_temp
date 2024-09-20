@@ -29,6 +29,13 @@ int main(void)
     // led_config();
     led_blink_config();
 
+    rs485_com_config();
+
+    bldc_config();
+    bldc_set_pwm(50);
+    delay_ms(5000);
+    bldc_enable_set(SET);
+
     while(1){
 
     }
