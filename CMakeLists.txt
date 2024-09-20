@@ -18,6 +18,7 @@ set(TARGET_C_SRC
         ${CMAKE_SOURCE_DIR}/src/main.c
         ${CMAKE_SOURCE_DIR}/src/gd32e23x_it.c
         ${CMAKE_SOURCE_DIR}/src/systick.c
+        ${CMAKE_SOURCE_DIR}/src/wc_bldc_control.c
 )
 
 add_executable(gd32e23_template ${TARGET_C_SRC})
