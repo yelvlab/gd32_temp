@@ -1,164 +1,232 @@
-/******************************************************************************
- * @file     startup_gd32e230k8t6.s
- * @brief    CMSIS-Core Device Startup File for Cortex-M23 Device GD32E230K8T6
- * @version  V2.2.0
- * @date     26. May 2021
- ******************************************************************************/
+  .syntax unified
+  .cpu cortex-m23
+  .fpu softvfp
+  .thumb
 
-                .syntax  unified
-                .cpu     cortex-m23
-                .fpu     softvfp
-                .thumb
+.global  g_pfnVectors
+.global  Default_Handler
 
-                .global  g_pfnVectors
-                .global  Default_Handler
+/* necessary symbols defined in linker script to initialize data */
+.word  _sidata
+.word  _sdata
+.word  _edata
+.word  _sbss
+.word  _ebss
 
-                .word    _sidata
-                .word    _sdata
-                .word    _edata
-                .word    _sbss
-                .word    _ebss
-/* Reset_Handler */
-                .section .text.Reset_Handler
-                .weak    Reset_Handler
-                .type    Reset_Handler, %function
+  .section  .text.Reset_Handler
+  .weak  Reset_Handler
+  .type  Reset_Handler, %function
+
+/* reset Handler */
 Reset_Handler:
-                ldr      r0, =_estack
-                msr      psp, r0
+    ldr   r0, =_sp
+    mov   sp, r0
+/* copy the data segment into ram */
+    movs  r1, #0
+    b  LoopCopyDataInit
 
-                ldr      r0, =_sdata
-                ldr      r1, =_edata
-                ldr      r2, =_sidata
-                movs     r3, #0
-                b        LoopCopyDataInit
 CopyDataInit:
-                ldr      r4, [r2, r3]
-                str      r4, [r0, r3]
-                adds     r3, r3, #4
+    ldr  r3, =_sidata
+    ldr  r3, [r3, r1]
+    str  r3, [r0, r1]
+    adds  r1, r1, #4
+
 LoopCopyDataInit:
-                adds     r4, r0, r3
-                cmp      r4, r1
-                bcc      CopyDataInit
-                
-                ldr      r2, =_sbss
-                ldr      r4, =_ebss
-                movs     r3, #0
-                b        LoopFillZerobss
+    ldr  r0, =_sdata
+    ldr  r3, =_edata
+    adds  r2, r0, r1
+    cmp  r2, r3
+    bcc  CopyDataInit
+    ldr  r2, =_sbss
+    b  LoopFillZerobss
+
 FillZerobss:
-                str      r3, [r2]
-                adds     r2, r2, #4
+    movs  r3, #0
+    str  r3, [r2]
+    adds r2, r2, #4
+
 LoopFillZerobss:
-                cmp      r2, r4
-                bcc      FillZerobss
+    ldr  r3, = _ebss
+    cmp  r2, r3
+    bcc  FillZerobss
 
-                bl       SystemInit   
-                bl       main
-                bx       lr    
-                .size    Reset_Handler, .-Reset_Handler
+/* Call SystemInit function */
+    bl  SystemInit
+/* Call static constructors */
+    bl __libc_init_array
+/*Call the main function */
+    bl  main
 
-/* Default_Handler */
-                .section .text.Default_Handler,"ax",%progbits
+LoopForever:
+    b LoopForever
+
+.size  Reset_Handler, .-Reset_Handler
+
+.section  .text.Default_Handler,"ax",%progbits
+
 Default_Handler:
 Infinite_Loop:
-                b         Infinite_Loop
-                .size     Default_Handler, .-Default_Handler
-/* Vector Table */
-                .section .isr_vector,"a",%progbits
-                .type     g_pfnVectors,%object
-                .size     g_pfnVectors, .-g_pfnVectors
-g_pfnVectors:
-                .word     _estack
-                .word     Reset_Handler
+    b  Infinite_Loop
+    .size  Default_Handler, .-Default_Handler
 
-                .word     NMI_Handler                        /* -14 NMI Handler */
-                .word     HardFault_Handler                  /* -13 Hard Fault Handler */
-                .word     0                                  /*     Reserved */
-                .word     0                                  /*     Reserved */
-                .word     0                                  /*     Reserved */
-                .word     0                                  /*     Reserved */
-                .word     0                                  /*     Reserved */
-                .word     0                                  /*     Reserved */
-                .word     0                                  /*     Reserved */
-                .word     SVC_Handler                        /*  -5 SVCall Handler */
-                .word     0                                  /*     Reserved */
-                .word     0                                  /*     Reserved */
-                .word     PendSV_Handler                     /*  -2 PendSV Handler */
-                .word     SysTick_Handler                    /*  -1 SysTick Handler */
+   .section  .vectors,"a",%progbits
+   .global __gVectors
 
-                .word     WWDGT_IRQHandler       
-                .word     LVD_IRQHandler
-                .word     RTC_IRQHandler
-                .word     FMC_IRQHandler                    
-                .word     RCU_IRQHandler                    
-                .word     EXTI0_1_IRQHandler                
-                .word     EXTI2_3_IRQHandler                
-                .word     EXTI4_15_IRQHandler               
-                .word     0                                
-                .word     DMA_Channel0_IRQHandler           
-                .word     DMA_Channel1_2_IRQHandler         
-                .word     DMA_Channel3_4_IRQHandler        
-                .word     ADC_CMP_IRQHandler               
-                .word     TIMER0_BRK_UP_TRG_COM_IRQHandler 
-                .word     TIMER0_Channel_IRQHandler        
-                .word     0      
-                .word     TIMER2_IRQHandler
-                .word     TIMER5_IRQHandler
-                .word     0
-                .word     TIMER13_IRQHandler
-                .word     TIMER14_IRQHandler
-                .word     TIMER15_IRQHandler
-                .word     TIMER16_IRQHandler
-                .word     I2C0_EV_IRQHandler
-                .word     I2C1_EV_IRQHandler
-                .word     SPI0_IRQHandler
-                .word     SPI1_IRQHandler
-                .word     USART0_IRQHandler
-                .word     USART1_IRQHandler
-                .word     0
-                .word     0
-                .word     0
-                .word     I2C0_ER_IRQHandler
-                .word     0
-                .word     I2C1_ER_IRQHandler
+__gVectors:
+                    .word _sp                                   /* Top of Stack */
+                    .word Reset_Handler                         /* 1:Reset Handler */
+                    .word NMI_Handler                           /* 2:NMI Handler */
+                    .word HardFault_Handler                     /* 3:Hard Fault Handler */
+                    .word 0                                     /* Reserved */
+                    .word 0                                     /* Reserved */
+                    .word 0                                     /* Reserved */
+                    .word 0                                     /* Reserved */
+                    .word 0                                     /* Reserved */
+                    .word 0                                     /* Reserved */
+                    .word 0                                     /* Reserved */
+                    .word SVC_Handler                           /* 11:SVCall Handler */
+                    .word 0                                     /* Reserved */
+                    .word 0                                     /* Reserved */
+                    .word PendSV_Handler                        /* 14:PendSV Handler */
+                    .word SysTick_Handler                       /* 15:SysTick Handler */
 
-.macro Set_Default_Handler Handler_Name
-.weak \Handler_Name
-.set  \Handler_Name, Default_Handler
-.endm
-/*
-                Set_Default_Handler  NMI_Handler
-                Set_Default_Handler  HardFault_Handler
-                Set_Default_Handler  SVC_Handler
-                Set_Default_Handler  PendSV_Handler
-                Set_Default_Handler  SysTick_Handler
-*/
-                
-                Set_Default_Handler  WWDGT_IRQHandler
-                Set_Default_Handler  LVD_IRQHandler
-                Set_Default_Handler  RTC_IRQHandler
-                Set_Default_Handler  FMC_IRQHandler
-                Set_Default_Handler  RCU_IRQHandler
-                Set_Default_Handler  EXTI0_1_IRQHandler
-                Set_Default_Handler  EXTI2_3_IRQHandler
-                Set_Default_Handler  EXTI4_15_IRQHandler
-                Set_Default_Handler  DMA_Channel0_IRQHandler
-                Set_Default_Handler  DMA_Channel1_2_IRQHandler
-                Set_Default_Handler  DMA_Channel3_4_IRQHandler
-                Set_Default_Handler  ADC_CMP_IRQHandler
-                Set_Default_Handler  TIMER0_BRK_UP_TRG_COM_IRQHandler
-                Set_Default_Handler  TIMER0_Channel_IRQHandler
-                Set_Default_Handler  TIMER2_IRQHandler
-                Set_Default_Handler  TIMER5_IRQHandler
-                Set_Default_Handler  TIMER13_IRQHandler
-                Set_Default_Handler  TIMER14_IRQHandler
-                Set_Default_Handler  TIMER15_IRQHandler
-                Set_Default_Handler  TIMER16_IRQHandler
-                Set_Default_Handler  I2C0_EV_IRQHandler
-                Set_Default_Handler  I2C1_EV_IRQHandler
-                Set_Default_Handler  SPI0_IRQHandler
-                Set_Default_Handler  SPI1_IRQHandler
-                Set_Default_Handler  USART0_IRQHandler
-                Set_Default_Handler  USART1_IRQHandler
-                Set_Default_Handler  I2C0_ER_IRQHandler
-                Set_Default_Handler  I2C1_ER_IRQHandler
-.end
+                    /* external interrupts handler */
+                    .word WWDGT_IRQHandler                      /* 16:Window Watchdog Timer */
+                    .word LVD_IRQHandler                        /* 17:LVD through EXTI Line detect */
+                    .word RTC_IRQHandler                        /* 18:RTC through EXTI Line */
+                    .word FMC_IRQHandler                        /* 19:FMC */
+                    .word RCU_IRQHandler                        /* 20:RCU */
+                    .word EXTI0_1_IRQHandler                    /* 21:EXTI Line 0 and EXTI Line 1 */
+                    .word EXTI2_3_IRQHandler                    /* 22:EXTI Line 2 and EXTI Line 3 */
+                    .word EXTI4_15_IRQHandler                   /* 23:EXTI Line 4 to EXTI Line 15 */
+                    .word 0                                     /* Reserved */
+                    .word DMA_Channel0_IRQHandler               /* 25:DMA Channel 0 */
+                    .word DMA_Channel1_2_IRQHandler             /* 26:DMA Channel 1 and DMA Channel 2 */
+                    .word DMA_Channel3_4_IRQHandler             /* 27:DMA Channel 3 and DMA Channel 4 */
+                    .word ADC_CMP_IRQHandler                    /* 28:ADC and Comparator */
+                    .word TIMER0_BRK_UP_TRG_COM_IRQHandler      /* 29:TIMER0 Break,Update,Trigger and Commutation */
+                    .word TIMER0_Channel_IRQHandler             /* 30:TIMER0 Channel Capture Compare */
+                    .word 0                                     /* Reserved */
+                    .word TIMER2_IRQHandler                     /* 32:TIMER2 */
+                    .word TIMER5_IRQHandler                     /* 33:TIMER5 */
+                    .word 0                                     /* Reserved */
+                    .word TIMER13_IRQHandler                    /* 35:TIMER13 */
+                    .word TIMER14_IRQHandler                    /* 36:TIMER14 */
+                    .word TIMER15_IRQHandler                    /* 37:TIMER15 */
+                    .word TIMER16_IRQHandler                    /* 38:TIMER16 */
+                    .word I2C0_EV_IRQHandler                    /* 39:I2C0 Event */
+                    .word I2C1_EV_IRQHandler                    /* 40:I2C1 Event */
+                    .word SPI0_IRQHandler                       /* 41:SPI0 */
+                    .word SPI1_IRQHandler                       /* 42:SPI1 */
+                    .word USART0_IRQHandler                     /* 43:USART0 */
+                    .word USART1_IRQHandler                     /* 44:USART1 */
+                    .word 0                                     /* Reserved */
+                    .word 0                                     /* Reserved */
+                    .word 0                                     /* Reserved */
+                    .word I2C0_ER_IRQHandler                    /* 48:I2C0 Error */
+                    .word 0                                     /* Reserved */
+                    .word I2C1_ER_IRQHandler                    /* 50:I2C1 Error */
+
+   .size   __gVectors, . - __gVectors
+
+  .weak NMI_Handler
+  .thumb_set NMI_Handler,Default_Handler
+
+  .weak HardFault_Handler
+  .thumb_set HardFault_Handler,Default_Handler
+
+  .weak SVC_Handler
+  .thumb_set SVC_Handler,Default_Handler
+
+  .weak PendSV_Handler
+  .thumb_set PendSV_Handler,Default_Handler
+
+  .weak SysTick_Handler
+  .thumb_set SysTick_Handler,Default_Handler
+
+  .weak WWDGT_IRQHandler
+  .thumb_set WWDGT_IRQHandler,Default_Handler
+
+  .weak LVD_IRQHandler
+  .thumb_set LVD_IRQHandler,Default_Handler
+
+  .weak TAMPER_IRQHandler
+  .thumb_set TAMPER_IRQHandler,Default_Handler
+
+  .weak RTC_IRQHandler
+  .thumb_set RTC_IRQHandler,Default_Handler
+
+  .weak FMC_IRQHandler
+  .thumb_set FMC_IRQHandler,Default_Handler
+
+  .weak RCU_IRQHandler
+  .thumb_set RCU_IRQHandler,Default_Handler
+
+  .weak EXTI0_1_IRQHandler
+  .thumb_set EXTI0_1_IRQHandler,Default_Handler
+
+  .weak EXTI2_3_IRQHandler
+  .thumb_set EXTI2_3_IRQHandler,Default_Handler
+
+  .weak EXTI4_15_IRQHandler
+  .thumb_set EXTI4_15_IRQHandler,Default_Handler
+
+  .weak DMA_Channel0_IRQHandler
+  .thumb_set DMA_Channel0_IRQHandler,Default_Handler
+
+  .weak DMA_Channel1_2_IRQHandler
+  .thumb_set DMA_Channel1_2_IRQHandler,Default_Handler
+
+  .weak DMA_Channel3_4_IRQHandler
+  .thumb_set DMA_Channel3_4_IRQHandler,Default_Handler
+
+  .weak ADC_CMP_IRQHandler
+  .thumb_set ADC_CMP_IRQHandler,Default_Handler
+
+  .weak TIMER0_BRK_UP_TRG_COM_IRQHandler
+  .thumb_set TIMER0_BRK_UP_TRG_COM_IRQHandler,Default_Handler
+
+  .weak TIMER0_Channel_IRQHandler
+  .thumb_set TIMER0_Channel_IRQHandler,Default_Handler
+
+  .weak TIMER2_IRQHandler
+  .thumb_set TIMER2_IRQHandler,Default_Handler
+
+  .weak TIMER5_IRQHandler
+  .thumb_set TIMER5_IRQHandler,Default_Handler
+
+  .weak TIMER13_IRQHandler
+  .thumb_set TIMER13_IRQHandler,Default_Handler
+
+  .weak TIMER14_IRQHandler
+  .thumb_set TIMER14_IRQHandler,Default_Handler
+
+  .weak TIMER15_IRQHandler
+  .thumb_set TIMER15_IRQHandler,Default_Handler
+
+  .weak TIMER16_IRQHandler
+  .thumb_set TIMER16_IRQHandler,Default_Handler
+
+  .weak I2C0_EV_IRQHandler
+  .thumb_set I2C0_EV_IRQHandler,Default_Handler
+
+  .weak I2C1_EV_IRQHandler
+  .thumb_set I2C1_EV_IRQHandler,Default_Handler
+
+  .weak SPI0_IRQHandler
+  .thumb_set SPI0_IRQHandler,Default_Handler
+
+  .weak SPI1_IRQHandler
+  .thumb_set SPI1_IRQHandler,Default_Handler
+
+  .weak USART0_IRQHandler
+  .thumb_set USART0_IRQHandler,Default_Handler
+
+  .weak USART1_IRQHandler
+  .thumb_set USART1_IRQHandler,Default_Handler
+
+  .weak I2C0_ER_IRQHandler
+  .thumb_set I2C0_ER_IRQHandler,Default_Handler
+
+  .weak I2C1_ER_IRQHandler
+  .thumb_set I2C1_ER_IRQHandler,Default_Handler
