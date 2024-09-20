@@ -6,7 +6,7 @@
  ******************************************************************************/
 
                 .syntax  unified
-                .arch    armv8-m.base
+                .cpu     cortex-m23
                 .fpu     softvfp
                 .thumb
 

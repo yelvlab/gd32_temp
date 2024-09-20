@@ -32,7 +32,7 @@ int main(void)
     rs485_com_config();
 
     bldc_config();
-    bldc_set_pwm(50);
+    bldc_set_pwm(80);
     delay_ms(5000);
     bldc_enable_set(SET);
 
