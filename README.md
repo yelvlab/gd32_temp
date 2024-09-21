@@ -1,4 +1,4 @@
-# gd32_temp
+# gd32e23x_template
 from mo10
 
 
