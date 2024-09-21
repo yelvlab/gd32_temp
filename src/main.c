@@ -4,7 +4,6 @@
     
     \version 2024-02-22, V2.1.0, firmware for GD32E23x
 */
-
 #include "main.h"
 #include <stdio.h>
 #include "gd32e23x.h"
@@ -20,7 +19,6 @@
     \param[out] none
     \retval     none
 */
-
 int main(void)
 {
     /* configure systick */
