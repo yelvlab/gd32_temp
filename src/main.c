@@ -34,15 +34,20 @@ int main(void)
     delay_ms(5000);
     bldc_enable_set(SET);
 
+    printf("system start!");
+
     while(1){
 
     }
 }
 
 /* retarget the C library printf function to the USART */
-int fputc(int ch, FILE *f)
+int _write (int fd, char *pBuffer, int size)
 {
-    usart_data_transmit(USART0, (uint8_t)ch);
-    while(RESET == usart_flag_get(USART0, USART_FLAG_TBE));
-    return ch;
+    for (int i = 0; i < size; i++)
+    {
+        usart_data_transmit(USART0, (uint8_t)pBuffer[i]);
+        while(RESET == usart_flag_get(USART0, USART_FLAG_TBE));
+    }
+    return size;
 }
