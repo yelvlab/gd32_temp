@@ -1,17 +1,16 @@
 /*!
     \file    main.c
     \brief   led spark with systick, USART print and key example
-    
+
     \version 2024-02-22, V2.1.0, firmware for GD32E23x
 */
 #include "main.h"
 #include <stdio.h>
 #include "gd32e23x.h"
 #include "systick.h"
-
 #include "gd32e23x_libopt.h"
 
-#include "wc_bldc_control.h"
+#include "peripheral.h"
 
 /*!
     \brief      main function
@@ -23,21 +22,15 @@ int main(void)
 {
     /* configure systick */
     systick_config();
-
-    // led_config();
+    usart_config();
     led_blink_config();
 
-    rs485_com_config();
-
-    bldc_config();
-    bldc_set_pwm(80);
     delay_ms(5000);
-    bldc_enable_set(SET);
-
-    printf("system start!");
+    printf("system start!\r\n");
 
     while(1){
-
+    printf("hello world!\r\n");
+    delay_ms(5000);
     }
 }
 
