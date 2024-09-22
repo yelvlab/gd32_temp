@@ -105,4 +105,4 @@ set(CMAKE_ASM_FLAGS_RELEASE      "-DNDEBUG -O3") #  -flto
 set(CMAKE_C_FLAGS          "${CMAKE_C_FLAGS} ${TARGET_CFLAGS_HARDWARE} ${TARGET_CFLAGS_EXTRA}")
 set(CMAKE_CXX_FLAGS        "${CMAKE_CXX_FLAGS} ${TARGET_CFLAGS_HARDWARE} ${TARGET_CXXFLAGS_EXTRA}")
 set(CMAKE_ASM_FLAGS        "${CMAKE_ASM_FLAGS} ${CMAKE_C_FLAGS} -x assembler-with-cpp")
-set(CMAKE_EXE_LINKER_FLAGS "-specs=nosys.specs -Wl,--gc-sections ${TARGET_LDFLAGS_EXTRA}")
+set(CMAKE_EXE_LINKER_FLAGS "--specs=nano.specs --specs=nosys.specs -Wl,--gc-sections ${TARGET_LDFLAGS_EXTRA}")
