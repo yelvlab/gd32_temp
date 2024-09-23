@@ -7,10 +7,10 @@ xs:noNamespaceSchemaLocation="CMSIS-SVD_Schema_1_1.xsd">
   <description>GD32E230 ARM 32-bit Cortex-M23 Microcontroller based device</description>
   <cpu>
   <name>CM23</name>
-  <revision>r0p0</revision>
+  <revision>r1p0</revision>
   <endian>little</endian>
-  <mpuPresent>1</mpuPresent>
-  <fpuPresent>1</fpuPresent>
+  <mpuPresent>0</mpuPresent>
+  <fpuPresent>0</fpuPresent>
   <nvicPrioBits>4</nvicPrioBits>
   <vendorSystickConfig>0</vendorSystickConfig>
   </cpu> 
